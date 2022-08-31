@@ -81,7 +81,7 @@ public class ControlFrame extends JFrame {
                 }
 
                 btnStart.setEnabled(false);
-
+                statisticsLabel.setText("<html>"+"Jugando<br>");
             }
         });
         toolBar.add(btnStart);
@@ -89,22 +89,16 @@ public class ControlFrame extends JFrame {
         JButton btnPauseAndCheck = new JButton("Pause and check");
         btnPauseAndCheck.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
-                /*
-				 * COMPLETAR
-                 */
                 int sum = 0;
-                for (Immortal im : immortals) {
-                    synchronized (lock) {
-                        sum += im.getHealth();
-                        //im.pauseImmortal();
+                synchronized (lock){
+                    for (Immortal im : immortals) {
+                        im.pauseIm();
                     }
                 }
-
+                for (Immortal im : immortals) {
+                    sum += im.getHealth();
+                }
                 statisticsLabel.setText("<html>"+immortals.toString()+"<br>Health sum:"+ sum);
-
-                
-
             }
         });
         toolBar.add(btnPauseAndCheck);
@@ -113,12 +107,13 @@ public class ControlFrame extends JFrame {
 
         btnResume.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                /**
-                 * IMPLEMENTAR
-                 */
                 synchronized (lock){
+                    for(Immortal immortal : immortals){
+                        immortal.resumeIm();
+                    }
                     lock.notifyAll();
                 }
+                statisticsLabel.setText("<html>"+"Jugando<br>");
             }
         });
 
@@ -134,6 +129,17 @@ public class ControlFrame extends JFrame {
 
         JButton btnStop = new JButton("STOP");
         btnStop.setForeground(Color.RED);
+        btnStop.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                synchronized (lock) {
+                    for (Immortal im : immortals) {
+                        im.play(false);
+                    }
+                    lock.notifyAll();
+                }
+                statisticsLabel.setText("<html>"+"<br>");
+            }
+        });
         toolBar.add(btnStop);
 
         scrollPane = new JScrollPane();
